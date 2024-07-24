@@ -1,0 +1,35 @@
+name: Go Test CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start sshd container for testing
+        run: |
+          cd .github
+          docker build -t dummy-sshd-container -f sshd.Dockerfile .
+          docker run -d -p 127.0.0.1:2222:22 --name dummy-sshd dummy-sshd-container
+          cd ..
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Run Tests
+        run: sleep 3 && go test ./...
+
+      - name: Stop test sshd
+        run: docker stop dummy-sshd && docker rm dummy-sshd

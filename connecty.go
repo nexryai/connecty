@@ -10,7 +10,7 @@ type Response struct {
 	Error  string `json:"error,omitempty"`
 }
 
-type conStat struct {
+type connectionStatus struct {
 	dir   string
 	err   error
 	bytes int64

@@ -106,25 +106,33 @@ func HandleWebsocket(wsConn *websocket.Conn) {
 	go ping(wsConn, done)
 
 	// Proxy the connection
+	status := make(chan connectionStatus)
+
 	// conn -> wsConn
 	go func() {
-		_, err := io.Copy(conn, wsConn)
+		b, err := io.Copy(conn, wsConn)
 		if err != nil {
 			log.Printf("failed to copy ws to conn: %v", err)
 		}
 
 		conn.Close()
+		status <- connectionStatus{"up", err, b}
 	}()
 
 	// wsConn -> conn
 	go func() {
-		_, err := io.Copy(wsConn, conn)
+		b, err := io.Copy(wsConn, conn)
 		if err != nil {
 			log.Printf("failed to copy conn to ws: %v", err)
 		}
 
 		wsConn.Close()
+		status <- connectionStatus{"down", err, b}
 	}()
+
+	// Wait for the connection to close
+	s := <-status
+	log.Printf("connection closed: %s, %d bytes, %v", s.dir, s.bytes, s.err)
 
 	close(done)
 }

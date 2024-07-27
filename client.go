@@ -10,13 +10,13 @@ import (
 	"net"
 )
 
-func CreateConnection(proxyUrl string, targetHost string, targetPort int) (net.Conn, error) {
+func CreateConnection(proxyUrl string, targetHost string, targetPort int, origin string) (net.Conn, error) {
 	req := Request{
 		Host: targetHost,
 		Port: targetPort,
 	}
 
-	conn, err := websocket.Dial(proxyUrl, "", "http://localhost/")
+	conn, err := websocket.Dial(proxyUrl, "", origin)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open ws: %v", err)
 	}

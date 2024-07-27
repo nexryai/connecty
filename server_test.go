@@ -23,7 +23,7 @@ func TestSSHProxy(t *testing.T) {
 	// Wait for the server to start
 	time.Sleep(3 * time.Second)
 
-	conn, err := CreateConnection("ws://localhost:8080/connect", "127.0.0.1", 2222)
+	conn, err := CreateConnection("ws://localhost:8080/connect", "127.0.0.1", 2222, "http://localhost")
 	if err != nil {
 		t.Fatalf("failed to create connection: %v", err)
 	}
